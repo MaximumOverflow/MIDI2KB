@@ -1,20 +1,13 @@
-#include <iostream>
 #include <fstream>
-
+#include <iostream>
 #include <rtmidi/RtMidi.h>
 
 extern "C" {
     #include <xdo.h>
 }
 
-enum KeyMapCondition { Exact, Threshold };
-
-struct KeyMap {
-    unsigned short key;
-    std::string toKey;
-    KeyMapCondition condition;
-    unsigned short trigger;
-};
+#include "KeyMap.h"
+#include "KeyEvent.h"
 
 xdo_t * x;
 RtMidiIn midi;
@@ -86,17 +79,8 @@ void ShowHelp()
 
 void ShowKeymap()
 {
-    std::ifstream config(configPath);
-    if(!config.is_open())
-    {
-        std::cout << "Keymap file could not be opened\n";
-        return;
-    }
-
-    std::string text((std::istreambuf_iterator<char>(config)),
-                     std::istreambuf_iterator<char>());
-    std::cout << text << "\n";
-    config.close();
+    for(auto& keymap : keymaps)
+        std::cout << keymap.ToString() << '\n';
 }
 
 void LoadKeymap()
@@ -118,16 +102,11 @@ void LoadKeymap()
     while(!config.eof())
     {
         try {
-            KeyMap keyMap;
-            config >> keyMap.key >> keyMap.toKey;
-            std::string condition;
-            config >> condition;
-            if(condition == "EXACT") keyMap.condition = KeyMapCondition::Exact;
-            else if(condition == "THRESHOLD") keyMap.condition = KeyMapCondition::Threshold;
-            else throw std::exception();
-            config >> keyMap.trigger;
-            keymaps.push_back(keyMap);
+            std::string condition, is, toKey;
+            unsigned short key = 0, trigger = 0;
 
+            config >> condition >> key >> is >> trigger >> toKey;
+            keymaps.emplace_back(condition, key, is, trigger, toKey);
         } catch (std::exception&) {}
     }
     config.close();
@@ -159,29 +138,19 @@ void SelectDevice()
 
 void OnMidiInput(double timeStamp, std::vector<unsigned char> *message, void *userData)
 {
-    if(message->size() < 3) return;
-
-    auto key = (unsigned short) message->at(1);
-    auto pressure = (unsigned short) message->at(2);
+    KeyEvent event(message);
 
     if(logEvents)
-        std::cout << "[KEY EVENT] KEY: " << key << " PRESSURE: " << pressure << '\n';
+        std::cout << event.ToString() << '\n';
 
-    for (auto& keyMap : keymaps) {
-        if(key == keyMap.key)
-        {
-            if(keyMap.condition == KeyMapCondition::Exact)
-                if(pressure == keyMap.trigger) ExecuteKeymap(keyMap);
-
-            if(keyMap.condition == KeyMapCondition::Threshold)
-                if(pressure >= keyMap.trigger) ExecuteKeymap(keyMap);
-        }
-    }
+    for (auto& keymap : keymaps)
+        if(keymap.CheckEvent(event))
+            ExecuteKeymap(keymap);
 }
 
 void ExecuteKeymap(KeyMap& keyMap) {
     if(logEvents)
-        std::cout << "[REMAP EVENT] KEY: " << keyMap.key << " DESTINATION: " << keyMap.toKey << '\n';
+        std::cout << "[REMAP EVENT] KEY: " << (unsigned short) keyMap.key << " DESTINATION: " << keyMap.toKey << '\n';
 
     xdo_send_keysequence_window(x, CURRENTWINDOW, keyMap.toKey.c_str(), 0);
 }

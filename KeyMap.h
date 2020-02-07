@@ -66,6 +66,8 @@ struct KeyMap {
                     return event.byte2 <= trigger;
             }
         }
+
+		return false;
     }
 
     std::string ToString()

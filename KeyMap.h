@@ -70,29 +70,36 @@ struct KeyMap {
     std::string ToString()
     {
         std::stringstream text;
-        std::string condition_, threshold_;
+        std::string condition_, threshold_, action_;
         unsigned short key_ = key;
 
         switch (condition)
         {
-            case KeyMapCondition::Any: condition_ = "key emits event"; break;
-            case KeyMapCondition::Press: condition_ = "key is pressed"; break;
-            case KeyMapCondition::Release: condition_ = "key is released"; break;
-            case KeyMapCondition::Pressure: condition_ = "key pressure changes"; break;
-
-            default: condition_ = "INVALID"; break;
+            case KeyMapCondition::Any: condition_ = "key emits event";              break;
+            case KeyMapCondition::Press: condition_ = "key is pressed";             break;
+            case KeyMapCondition::Release: condition_ = "key is released";          break;
+            case KeyMapCondition::Pressure: condition_ = "key pressure changes";    break;
         }
 
         switch (threshold)
         {
-            case KeyMapCondition::ThresholdExact: threshold_ = "="; break;
-            case KeyMapCondition::ThresholdUp: threshold_ = ">="; break;
+            case KeyMapCondition::ThresholdUp: threshold_ = ">=";   break;
             case KeyMapCondition::ThresholdDown: threshold_ = "<="; break;
 
-            default: threshold_ = "INVALID"; break;
+            case KeyMapCondition::ThresholdAny:
+            case KeyMapCondition::ThresholdExact: threshold_ = "="; break;
         }
 
-        text << key_ << "->" << toKey << " if " << condition_ << " and value " << threshold_ << ' ' << trigger;
+        switch(action)
+        {
+            case KeyMapAction::Hold:    action_ = "hold";       break;
+            case KeyMapAction::Press:   action_ = "press";      break;
+            case KeyMapAction::Toggle:  action_ = "toggle";     break;
+            case KeyMapAction::Release: action_ = "release";    break;
+        }
+
+        text << key_ << " -> " << action_ << ' ' << toKey << " if " << condition_ << " and value " << threshold_ << ' ' <<
+            (threshold != KeyMapCondition::ThresholdAny ? std::to_string(trigger) : "any value");
 
         return text.str();
     }

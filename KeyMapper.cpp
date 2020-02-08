@@ -99,7 +99,7 @@ void KeyMapper::OnMidiInput(double timeStamp, std::vector<unsigned char> *messag
 	auto keyMapper = current;
 	KeyEvent event(message);
 
-	if(keyMapper->logEvents)
+    if(keyMapper->logEvents)
 		std::cout << '\n' << event.ToString();
 
 	if(keyMapper->keyMaps != nullptr)

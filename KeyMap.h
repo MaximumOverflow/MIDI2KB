@@ -49,7 +49,7 @@ struct KeyMap {
             {
                 if(key != event.byte1) return false;
 
-				if(threshold == KeyMapCondition::Any)
+				if(threshold == KeyMapCondition::ThresholdAny)
                 	return true;
 
                 if(threshold == KeyMapCondition::ThresholdExact)

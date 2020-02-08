@@ -5,7 +5,7 @@ SPACE: ' ';
 
 CHAR: [a-zA-Z];
 NUMBER: [0-9]+;
-path: (CHAR | '.' | '/')+;
+path: (CHAR | '.' | '/' | SPACE)+;
 
 identifier: CHAR (CHAR | NUMBER)*;
 value: path | NUMBER | identifier;

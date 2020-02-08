@@ -74,8 +74,8 @@ void KeyMapper::SelectDevice()
 	std::cin.ignore(INT8_MAX, '\n');
 }
 
-void KeyMapper::SelectDevice(int device) {
-    if(device > midi.getPortCount() || device < 0)
+void KeyMapper::SelectDevice(unsigned int device) {
+    if(device > midi.getPortCount())
     {
         std::cout << "No such device\n";
         return;
@@ -90,6 +90,7 @@ void KeyMapper::SelectDevice(int device) {
     midi.openPort(device);
     midi.ignoreTypes();
     midi.setCallback(KeyMapper::OnMidiInput, nullptr);
+    std::cout << "Device " << device << " selected\n";
 }
 
 
@@ -182,4 +183,11 @@ std::string KeyMapper::GetKeyMapAsString()
 		text << keymap.ToString() << '\n';
 
 	return text.str();
+}
+
+std::vector<std::pair<int, std::string>> KeyMapper::GetDeviceList() {
+    std::vector<std::pair<int, std::string>> devices;
+    for(unsigned int i = 0; i < midi.getPortCount(); i++)
+        devices.emplace_back(i, midi.getPortName(i));
+    return devices;
 }

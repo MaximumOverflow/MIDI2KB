@@ -41,11 +41,12 @@ public:
 	void ReloadKeymap() { LoadKeymap(configPath); }
 	void ClearKeymap();
 	void SelectDevice();
-	void SelectDevice(int device);
+	void SelectDevice(unsigned int device);
 	bool HasActiveDevice() { return midi.isPortOpen(); }
 	std::string GetKeyMapAsString();
 	void ExecuteKeymap(KeyMap& keyMap);
 	void MakeCurrent() { current = this; }
+	std::vector<std::pair<int, std::string>> GetDeviceList();
 
 	static void OnMidiInput(double timeStamp, std::vector<unsigned char> *message, void *userData);
 	static KeyMapper* Current() { return current; };

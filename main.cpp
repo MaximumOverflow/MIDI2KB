@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
         if(command == "quit" || command == "exit") break;
         else if(command == "help") ShowHelp();
-        else if(command == "list") keyMapper.ShowKeymap();
+        else if(command == "list") std::cout << keyMapper.GetKeyMapAsString();
         else if(command == "reload") keyMapper.LoadKeymap();
         else if(command == "change device") keyMapper.SelectDevice();
         else if(command.substr(0, 5) == "load ") {

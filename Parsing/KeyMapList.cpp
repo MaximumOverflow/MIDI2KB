@@ -19,14 +19,15 @@ KeyMapList::KeyMapList(const std::string &filePath) {
 	KeyMapsLexer lexer(&inputStream);
 	CommonTokenStream tokens(&lexer);
 	KeyMapsParser parser(&tokens);
-	parser.keymaps();
+
+	auto context = parser.keymaps();
+
 	if(parser.getNumberOfSyntaxErrors())
 	{
 		valid = false;
 		return;
 	}
 
-	auto context = parser.keymaps();
 	for(auto& keyMapDef : context->keymap())
 	{
 		KeyMap keyMap;

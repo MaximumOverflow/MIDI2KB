@@ -5,16 +5,26 @@
 std::unordered_map<std::string, unsigned char> KeyMapper::winKeyCodes;
 #endif
 
-void KeyMapper::ShowKeymap()
-{
-	if(keyMaps == nullptr)
+KeyMapper::KeyMapper() {
+#ifdef WIN32
+	if(winKeyCodes.empty())
 	{
-		std::cout << "No keymaps to show\n";
-		return;
-	}
+		for(unsigned char c = 0x41; c <= 0x5A; c++)		//A-Z keys
+			winKeyCodes[std::to_string(c)] = c;
 
-	for(auto& keymap : keyMaps->keyMaps)
-		std::cout << keymap.ToString() << '\n';
+		for(unsigned char c = 1; c <= 24; c++)			//F1-F24 Keys
+			winKeyCodes["F" + std::to_string(c)] = c+0x6F;
+	}
+#else
+	x = xdo_new(nullptr);
+#endif
+}
+
+KeyMapper::~KeyMapper() {
+#ifdef WIN32
+#else
+	xdo_free(x);
+#endif
 }
 
 void KeyMapper::LoadKeymap()
@@ -100,24 +110,14 @@ void KeyMapper::ExecuteKeymap(KeyMap& keyMap) {
 	#endif
 }
 
-KeyMapper::KeyMapper() {
-	#ifdef WIN32
-	if(winKeyCodes.empty())
-	{
-		for(unsigned char c = 0x41; c <= 0x5A; c++)		//A-Z keys
-			winKeyCodes[std::to_string(c)] = c;
+std::string KeyMapper::GetKeyMapAsString()
+{
+	if(keyMaps == nullptr)
+		return  "No keymaps";
 
-		for(unsigned char c = 1; c <= 24; c++)			//F1-F24 Keys
-			winKeyCodes["F" + std::to_string(c)] = c+0x6F;
-	}
-	#else
-	x = xdo_new(nullptr);
-	#endif
-}
+	std::stringstream text;
+	for(auto& keymap : keyMaps->keyMaps)
+		text << keymap.ToString() << '\n';
 
-KeyMapper::~KeyMapper() {
-	#ifdef WIN32
-	#else
-	xdo_free(x);
-	#endif
+	return text.str();
 }

@@ -36,9 +36,9 @@ public:
 	bool logEvents = false;
 
 	void LoadKeymap();
-	void ShowKeymap();
 	void ClearKeymap();
 	void SelectDevice();
+	std::string GetKeyMapAsString();
 	void ExecuteKeymap(KeyMap& keyMap);
 
 	static void OnMidiInput(double timeStamp, std::vector<unsigned char> *message, void *userData);

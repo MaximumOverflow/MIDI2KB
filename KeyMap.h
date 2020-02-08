@@ -20,10 +20,12 @@ enum class KeyMapCondition {
 struct KeyMap {
     unsigned char key;
     std::string toKey;
-    KeyMapCondition condition, is;
+    KeyMapCondition condition, threshold;
     unsigned short trigger;
 
-    KeyMap(const std::string& condition, unsigned short key, const std::string& is, unsigned short trigger, const std::string& toKey)
+	KeyMap() : key{0}, toKey{""}, condition{0}, threshold{0}, trigger{0} {}
+
+	KeyMap(const std::string& condition, unsigned short key, const std::string& is, unsigned short trigger, const std::string& toKey)
     {
         this->key = key;
         this->toKey = toKey;
@@ -34,10 +36,11 @@ struct KeyMap {
         else if(condition == "RELEASE") this->condition = KeyMapCondition::Release;
         else if(condition == "PRESSURE") this->condition = KeyMapCondition::Pressure;
 
-        if(is == "IS") this->is = KeyMapCondition::Exact;
-        else if (is == "ABOVE") this->is = KeyMapCondition::ThresholdUp;
-        else if (is == "BELOW") this->is = KeyMapCondition::ThresholdDown;
+        if(is == "IS") this->threshold = KeyMapCondition::Exact;
+        else if (is == "ABOVE") this->threshold = KeyMapCondition::ThresholdUp;
+        else if (is == "BELOW") this->threshold = KeyMapCondition::ThresholdDown;
     }
+
 
     bool CheckEvent(KeyEvent& event)
     {
@@ -56,13 +59,13 @@ struct KeyMap {
             {
                 if(key != event.byte1) return false;
 
-                if(is == KeyMapCondition::Exact)
+                if(threshold == KeyMapCondition::Exact)
                     return trigger == event.byte2;
 
-                if(is == KeyMapCondition::ThresholdUp)
+                if(threshold == KeyMapCondition::ThresholdUp)
                     return event.byte2 >= trigger;
 
-                if(is == KeyMapCondition::ThresholdDown)
+                if(threshold == KeyMapCondition::ThresholdDown)
                     return event.byte2 <= trigger;
             }
         }
@@ -86,7 +89,7 @@ struct KeyMap {
             default: condition_ = "INVALID"; break;
         }
 
-        switch (is)
+        switch (threshold)
         {
             case KeyMapCondition::Exact: is_ = "="; break;
             case KeyMapCondition::ThresholdUp: is_ = ">="; break;

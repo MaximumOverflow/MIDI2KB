@@ -15,6 +15,7 @@ extern "C" {
 
 #include "KeyMap.h"
 #include "KeyEvent.h"
+#include "Parsing/KeyMapList.h"
 
 
 class KeyMapper {
@@ -25,7 +26,7 @@ private:
 	xdo_t * x;
 	#endif
 	RtMidiIn midi;
-	std::vector<KeyMap> keymaps;
+	KeyMapList* keyMaps = nullptr;
 
 public:
 	KeyMapper();

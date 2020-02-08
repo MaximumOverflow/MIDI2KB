@@ -3,12 +3,17 @@
 
 #ifdef WIN32
 std::unordered_map<std::string, unsigned char> KeyMapper::winKeyCodes;
-#define KEYEVENT_KEYUP 0x02
 #endif
 
 void KeyMapper::ShowKeymap()
 {
-	for(auto& keymap : keymaps)
+	if(keyMaps == nullptr)
+	{
+		std::cout << "No keymaps to show\n";
+		return;
+	}
+
+	for(auto& keymap : keyMaps->keyMaps)
 		std::cout << keymap.ToString() << '\n';
 }
 
@@ -21,30 +26,21 @@ void KeyMapper::LoadKeymap()
 	}
 
 	std::cout << "Loading keymap from " << configPath << "...\n";
-	keymaps.clear();
-	std::ifstream config(configPath);
-	if(!config.is_open())
+	delete keyMaps;
+	keyMaps = new KeyMapList(configPath);
+	if(!keyMaps->valid)
 	{
-		std::cout << "Keymap file could not be opened\n";
-		return;
+		delete keyMaps;
+		keyMaps = nullptr;
+		std::cout << "The provided config file contains errors, please fix it before proceeding\n";
 	}
-	while(!config.eof())
-	{
-		try {
-			std::string condition, is, toKey;
-			unsigned short key = 0, trigger = 0;
-
-			config >> condition >> key >> is >> trigger >> toKey;
-			keymaps.emplace_back(condition, key, is, trigger, toKey);
-		} catch (std::exception&) {}
-	}
-	config.close();
-	std::cout << "Keymap loaded\n";
+	else std::cout << "Keymap loaded\n";
 }
 
 void KeyMapper::ClearKeymap() {
 	configPath = "";
-	keymaps.clear();
+	delete keyMaps;
+	keyMaps = nullptr;
 }
 
 void KeyMapper::SelectDevice()
@@ -84,9 +80,10 @@ void KeyMapper::OnMidiInput(double timeStamp, std::vector<unsigned char> *messag
 	if(keyMapper->logEvents)
 		std::cout << event.ToString() << '\n';
 
-	for (auto& keymap : keyMapper->keymaps)
-		if(keymap.CheckEvent(event))
-			keyMapper->ExecuteKeymap(keymap);
+	if(keyMapper->keyMaps != nullptr)
+		for (auto& keymap : keyMapper->keyMaps->keyMaps)
+			if(keymap.CheckEvent(event))
+				keyMapper->ExecuteKeymap(keymap);
 }
 
 void KeyMapper::ExecuteKeymap(KeyMap& keyMap) {
@@ -96,7 +93,7 @@ void KeyMapper::ExecuteKeymap(KeyMap& keyMap) {
 	#ifdef WIN32
 	auto key = winKeyCodes[keyMap.toKey];
 	keybd_event(key,0,0,0);
-	keybd_event(key,0,KEYEVENT_KEYUP,0);
+	keybd_event(key,0,KEYEVENTF_KEYUP,0);
 	std::cout << std::hex << (unsigned short) key;
 	#else
 	xdo_send_keysequence_window(x, CURRENTWINDOW, keyMap.toKey.c_str(), 0);

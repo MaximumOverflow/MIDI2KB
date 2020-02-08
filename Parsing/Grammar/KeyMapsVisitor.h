@@ -1,5 +1,5 @@
 
-// Generated from C:/Users/maxim/CLionProjects/MIDI2KB/Parsing/Grammar\KeyMaps.g4 by ANTLR 4.8
+// Generated from /home/max/CLionProjects/MIDI2KB/Parsing/Grammar/KeyMaps.g4 by ANTLR 4.8
 
 #pragma once
 
@@ -19,6 +19,8 @@ public:
   /**
    * Visit parse trees produced by KeyMapsParser.
    */
+    virtual antlrcpp::Any visitComment(KeyMapsParser::CommentContext *context) = 0;
+
     virtual antlrcpp::Any visitKey(KeyMapsParser::KeyContext *context) = 0;
 
     virtual antlrcpp::Any visitValue(KeyMapsParser::ValueContext *context) = 0;

@@ -1,5 +1,5 @@
 
-// Generated from C:/Users/maxim/CLionProjects/MIDI2KB/Parsing/Grammar\KeyMaps.g4 by ANTLR 4.8
+// Generated from /home/max/CLionProjects/MIDI2KB/Parsing/Grammar/KeyMaps.g4 by ANTLR 4.8
 
 #pragma once
 
@@ -13,8 +13,8 @@ class  KeyMapsLexer : public antlr4::Lexer {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, WS = 14, 
-    SEMICOLON = 15, NUMBER = 16, IDENTIFIER = 17
+    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
+    T__14 = 15, WS = 16, SEMICOLON = 17, NUMBER = 18, IDENTIFIER = 19
   };
 
   KeyMapsLexer(antlr4::CharStream *input);

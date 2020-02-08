@@ -1,5 +1,5 @@
 
-// Generated from C:/Users/maxim/CLionProjects/MIDI2KB/Parsing/Grammar\KeyMaps.g4 by ANTLR 4.8
+// Generated from /home/max/CLionProjects/MIDI2KB/Parsing/Grammar/KeyMaps.g4 by ANTLR 4.8
 
 #pragma once
 
@@ -15,6 +15,9 @@
  */
 class  KeyMapsBaseListener : public KeyMapsListener {
 public:
+
+  virtual void enterComment(KeyMapsParser::CommentContext * /*ctx*/) override { }
+  virtual void exitComment(KeyMapsParser::CommentContext * /*ctx*/) override { }
 
   virtual void enterKey(KeyMapsParser::KeyContext * /*ctx*/) override { }
   virtual void exitKey(KeyMapsParser::KeyContext * /*ctx*/) override { }

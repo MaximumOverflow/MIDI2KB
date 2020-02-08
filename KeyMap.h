@@ -29,7 +29,7 @@ struct KeyMap {
 	KeyMapAction action;
 	bool toggle = false;
 
-//	KeyMap() : key{0}, toKey{""}, condition{0}, threshold{0}, trigger{0} {}
+	KeyMap() : key{0}, toKey{""}, condition{0}, threshold{0}, trigger{0} {}
 
 
     bool CheckEvent(KeyEvent& event)

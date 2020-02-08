@@ -1,5 +1,5 @@
 
-// Generated from C:/Users/maxim/CLionProjects/MIDI2KB/Parsing/Grammar\KeyMaps.g4 by ANTLR 4.8
+// Generated from /home/max/CLionProjects/MIDI2KB/Parsing/Grammar/KeyMaps.g4 by ANTLR 4.8
 
 #pragma once
 
@@ -14,6 +14,10 @@
  */
 class  KeyMapsBaseVisitor : public KeyMapsVisitor {
 public:
+
+  virtual antlrcpp::Any visitComment(KeyMapsParser::CommentContext *ctx) override {
+    return visitChildren(ctx);
+  }
 
   virtual antlrcpp::Any visitKey(KeyMapsParser::KeyContext *ctx) override {
     return visitChildren(ctx);

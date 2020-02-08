@@ -2,6 +2,7 @@ grammar KeyMaps;
 
 WS: (' ' | '\t' | '\n') -> skip;
 SEMICOLON: ';';
+comment: ('[' (.)*? ']');
 
 NUMBER: [0-9]+;
 IDENTIFIER: [a-zA-Z][a-zA-Z0-9]*;
@@ -31,4 +32,4 @@ trigger_action
     ;
 
 keymap: trigger_condition key trigger_threshold value '->' trigger_action destination SEMICOLON;
-keymaps: keymap*;
+keymaps: (keymap | comment)*;

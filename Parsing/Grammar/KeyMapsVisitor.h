@@ -29,6 +29,8 @@ public:
 
     virtual antlrcpp::Any visitTrigger_threshold(KeyMapsParser::Trigger_thresholdContext *context) = 0;
 
+    virtual antlrcpp::Any visitTrigger_action(KeyMapsParser::Trigger_actionContext *context) = 0;
+
     virtual antlrcpp::Any visitKeymap(KeyMapsParser::KeymapContext *context) = 0;
 
     virtual antlrcpp::Any visitKeymaps(KeyMapsParser::KeymapsContext *context) = 0;

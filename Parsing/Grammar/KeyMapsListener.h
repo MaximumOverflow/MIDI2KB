@@ -29,6 +29,9 @@ public:
   virtual void enterTrigger_threshold(KeyMapsParser::Trigger_thresholdContext *ctx) = 0;
   virtual void exitTrigger_threshold(KeyMapsParser::Trigger_thresholdContext *ctx) = 0;
 
+  virtual void enterTrigger_action(KeyMapsParser::Trigger_actionContext *ctx) = 0;
+  virtual void exitTrigger_action(KeyMapsParser::Trigger_actionContext *ctx) = 0;
+
   virtual void enterKeymap(KeyMapsParser::KeymapContext *ctx) = 0;
   virtual void exitKeymap(KeyMapsParser::KeymapContext *ctx) = 0;
 

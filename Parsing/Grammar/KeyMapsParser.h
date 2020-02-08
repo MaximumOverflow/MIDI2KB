@@ -13,12 +13,13 @@ class  KeyMapsParser : public antlr4::Parser {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    WS = 8, SEMICOLON = 9, NUMBER = 10, IDENTIFIER = 11
+    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, WS = 14, 
+    SEMICOLON = 15, NUMBER = 16, IDENTIFIER = 17
   };
 
   enum {
     RuleKey = 0, RuleValue = 1, RuleDestination = 2, RuleTrigger_condition = 3, 
-    RuleTrigger_threshold = 4, RuleKeymap = 5, RuleKeymaps = 6
+    RuleTrigger_threshold = 4, RuleTrigger_action = 5, RuleKeymap = 6, RuleKeymaps = 7
   };
 
   KeyMapsParser(antlr4::TokenStream *input);
@@ -36,6 +37,7 @@ public:
   class DestinationContext;
   class Trigger_conditionContext;
   class Trigger_thresholdContext;
+  class Trigger_actionContext;
   class KeymapContext;
   class KeymapsContext; 
 
@@ -56,6 +58,7 @@ public:
 
   class  ValueContext : public antlr4::ParserRuleContext {
   public:
+    antlr4::Token *any = nullptr;;
     ValueContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *NUMBER();
@@ -119,6 +122,24 @@ public:
 
   Trigger_thresholdContext* trigger_threshold();
 
+  class  Trigger_actionContext : public antlr4::ParserRuleContext {
+  public:
+    antlr4::Token *hold = nullptr;;
+    antlr4::Token *press = nullptr;;
+    antlr4::Token *toggle = nullptr;;
+    antlr4::Token *release = nullptr;;
+    Trigger_actionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Trigger_actionContext* trigger_action();
+
   class  KeymapContext : public antlr4::ParserRuleContext {
   public:
     KeymapContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -127,6 +148,7 @@ public:
     KeyContext *key();
     Trigger_thresholdContext *trigger_threshold();
     ValueContext *value();
+    Trigger_actionContext *trigger_action();
     DestinationContext *destination();
     antlr4::tree::TerminalNode *SEMICOLON();
 

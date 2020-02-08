@@ -31,6 +31,9 @@ public:
   virtual void enterTrigger_threshold(KeyMapsParser::Trigger_thresholdContext * /*ctx*/) override { }
   virtual void exitTrigger_threshold(KeyMapsParser::Trigger_thresholdContext * /*ctx*/) override { }
 
+  virtual void enterTrigger_action(KeyMapsParser::Trigger_actionContext * /*ctx*/) override { }
+  virtual void exitTrigger_action(KeyMapsParser::Trigger_actionContext * /*ctx*/) override { }
+
   virtual void enterKeymap(KeyMapsParser::KeymapContext * /*ctx*/) override { }
   virtual void exitKeymap(KeyMapsParser::KeymapContext * /*ctx*/) override { }
 

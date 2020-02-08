@@ -35,6 +35,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitTrigger_action(KeyMapsParser::Trigger_actionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitKeymap(KeyMapsParser::KeymapContext *ctx) override {
     return visitChildren(ctx);
   }

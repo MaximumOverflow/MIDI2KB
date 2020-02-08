@@ -5,7 +5,7 @@
 #include "KeyEvent.h"
 
 enum class KeyMapCondition {
-    Exact, ThresholdUp, ThresholdDown,
+    ThresholdExact, ThresholdUp, ThresholdDown, ThresholdAny,
 
     Any = 0x70,
     Press = 0x90,
@@ -17,29 +17,19 @@ enum class KeyMapCondition {
     ControllerChange = 0xB0,
 };
 
+enum class KeyMapAction {
+	Hold, Press, Toggle, Release
+};
+
 struct KeyMap {
     unsigned char key;
     std::string toKey;
     KeyMapCondition condition, threshold;
     unsigned short trigger;
+	KeyMapAction action;
+	bool toggle = false;
 
 	KeyMap() : key{0}, toKey{""}, condition{0}, threshold{0}, trigger{0} {}
-
-	KeyMap(const std::string& condition, unsigned short key, const std::string& is, unsigned short trigger, const std::string& toKey)
-    {
-        this->key = key;
-        this->toKey = toKey;
-        this->trigger = trigger;
-
-        if(condition == "ANY") this->condition = KeyMapCondition::Any;
-        else if(condition == "PRESS") this->condition = KeyMapCondition::Press;
-        else if(condition == "RELEASE") this->condition = KeyMapCondition::Release;
-        else if(condition == "PRESSURE") this->condition = KeyMapCondition::Pressure;
-
-        if(is == "IS") this->threshold = KeyMapCondition::Exact;
-        else if (is == "ABOVE") this->threshold = KeyMapCondition::ThresholdUp;
-        else if (is == "BELOW") this->threshold = KeyMapCondition::ThresholdDown;
-    }
 
 
     bool CheckEvent(KeyEvent& event)
@@ -59,7 +49,10 @@ struct KeyMap {
             {
                 if(key != event.byte1) return false;
 
-                if(threshold == KeyMapCondition::Exact)
+				if(threshold == KeyMapCondition::Any)
+                	return true;
+
+                if(threshold == KeyMapCondition::ThresholdExact)
                     return trigger == event.byte2;
 
                 if(threshold == KeyMapCondition::ThresholdUp)
@@ -67,6 +60,7 @@ struct KeyMap {
 
                 if(threshold == KeyMapCondition::ThresholdDown)
                     return event.byte2 <= trigger;
+
             }
         }
 
@@ -76,7 +70,7 @@ struct KeyMap {
     std::string ToString()
     {
         std::stringstream text;
-        std::string condition_, is_;
+        std::string condition_, threshold_;
         unsigned short key_ = key;
 
         switch (condition)
@@ -91,14 +85,14 @@ struct KeyMap {
 
         switch (threshold)
         {
-            case KeyMapCondition::Exact: is_ = "="; break;
-            case KeyMapCondition::ThresholdUp: is_ = ">="; break;
-            case KeyMapCondition::ThresholdDown: is_ = "<="; break;
+            case KeyMapCondition::ThresholdExact: threshold_ = "="; break;
+            case KeyMapCondition::ThresholdUp: threshold_ = ">="; break;
+            case KeyMapCondition::ThresholdDown: threshold_ = "<="; break;
 
-            default: is_ = "INVALID"; break;
+            default: threshold_ = "INVALID"; break;
         }
 
-        text << key_ << "->" << toKey << " if " << condition_ << " and value " << is_ << ' ' << trigger;
+        text << key_ << "->" << toKey << " if " << condition_ << " and value " << threshold_ << ' ' << trigger;
 
         return text.str();
     }

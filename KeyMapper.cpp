@@ -1,31 +1,28 @@
 #include <fstream>
 #include "KeyMapper.h"
 
+
 #ifdef WIN32
 std::unordered_map<std::string, unsigned char> KeyMapper::winKeyCodes;
-#endif
 
-KeyMapper::KeyMapper() {
-#ifdef WIN32
+KeyMapper::KeyMapper()
+{
 	if(winKeyCodes.empty())
 	{
 		for(unsigned char c = 0x41; c <= 0x5A; c++)		//A-Z keys
-			winKeyCodes[std::to_string(c)] = c;
+			winKeyCodes[std::string(1, c)] = c;
 
 		for(unsigned char c = 1; c <= 24; c++)			//F1-F24 Keys
 			winKeyCodes["F" + std::to_string(c)] = c+0x6F;
 	}
-#else
-	x = xdo_new(nullptr);
-#endif
 }
 
-KeyMapper::~KeyMapper() {
-#ifdef WIN32
+KeyMapper::~KeyMapper() {}
 #else
-	xdo_free(x);
+KeyMapper::KeyMapper() { x = xdo_new(nullptr); }
+KeyMapper::~KeyMapper() { xdo_free(x); }
 #endif
-}
+
 
 void KeyMapper::LoadKeymap()
 {
@@ -96,19 +93,43 @@ void KeyMapper::OnMidiInput(double timeStamp, std::vector<unsigned char> *messag
 				keyMapper->ExecuteKeymap(keymap);
 }
 
-void KeyMapper::ExecuteKeymap(KeyMap& keyMap) {
-	if(logEvents)
-		std::cout << "[REMAP EVENT] KEY: " << (unsigned short) keyMap.key << " DESTINATION: " << keyMap.toKey << '\n';
+#ifdef WIN32
+void KeyMapper::ExecuteKeymap(KeyMap &keyMap) {
 
-	#ifdef WIN32
 	auto key = winKeyCodes[keyMap.toKey];
-	keybd_event(key,0,0,0);
-	keybd_event(key,0,KEYEVENTF_KEYUP,0);
-	std::cout << std::hex << (unsigned short) key;
-	#else
-	xdo_send_keysequence_window(x, CURRENTWINDOW, keyMap.toKey.c_str(), 0);
-	#endif
+
+	switch (keyMap.action)
+	{
+		case KeyMapAction::Hold:
+			keybd_event(key,0,KEYEVENTF_SCANCODE,0);
+			if(logEvents) std::cout << "[REMAP EVENT] KEY: " << (unsigned short) keyMap.key << " ACTION: HOLD " << keyMap.toKey << '\n';
+			break;
+
+		case KeyMapAction::Press:
+			keybd_event(key,0,0,0);
+			keybd_event(key,0, KEYEVENTF_KEYUP,0);
+			if(logEvents) std::cout << "[REMAP EVENT] KEY: " << (unsigned short) keyMap.key << " ACTION: PRESS " << keyMap.toKey << '\n';
+			break;
+
+		case KeyMapAction::Toggle:
+
+			keyMap.toggle = !keyMap.toggle;
+			if(keyMap.toggle)	keybd_event(key,0,0,0);
+			else 				keybd_event(key,0, KEYEVENTF_KEYUP,0);
+			if(logEvents) std::cout << "[REMAP EVENT] KEY: " << (unsigned short) keyMap.key << " ACTION: TOGGLE " << keyMap.toKey << " TO " << keyMap.toggle << '\n';
+			break;
+
+		case KeyMapAction::Release:
+			keybd_event(key,0, KEYEVENTF_KEYUP,0);
+			if(logEvents) std::cout << "[REMAP EVENT] KEY: " << (unsigned short) keyMap.key << " ACTION: RELEASE " << keyMap.toKey << '\n';
+			break;
+	}
 }
+#else
+void KeyMapper::ExecuteKeymap(KeyMap& keyMap) {
+	xdo_send_keysequence_window(x, CURRENTWINDOW, keyMap.toKey.c_str(), 0);
+}
+#endif
 
 std::string KeyMapper::GetKeyMapAsString()
 {

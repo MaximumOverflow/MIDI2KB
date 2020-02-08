@@ -1,7 +1,7 @@
 #ifndef MIDI2KB_KEYMAPLIST_H
 #define MIDI2KB_KEYMAPLIST_H
 
-#include "../KeyMap.h"
+#include "../../KeyMap.h"
 
 struct KeyMapList {
 	std::vector<KeyMap> keyMaps;

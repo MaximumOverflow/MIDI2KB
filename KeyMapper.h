@@ -15,11 +15,13 @@ extern "C" {
 
 #include "KeyMap.h"
 #include "KeyEvent.h"
-#include "Parsing/KeyMapList.h"
+#include "Parsing/KeyMaps/KeyMapList.h"
 
 
 class KeyMapper {
 private:
+    static KeyMapper* current;
+
 	#ifdef WIN32
 	static std::unordered_map<std::string, unsigned char> winKeyCodes;
 	#else
@@ -35,13 +37,18 @@ public:
 	std::string configPath;
 	bool logEvents = false;
 
-	void LoadKeymap();
+	void LoadKeymap(const std::string& configPath);
+	void ReloadKeymap() { LoadKeymap(configPath); }
 	void ClearKeymap();
 	void SelectDevice();
+	void SelectDevice(int device);
+	bool HasActiveDevice() { return midi.isPortOpen(); }
 	std::string GetKeyMapAsString();
 	void ExecuteKeymap(KeyMap& keyMap);
+	void MakeCurrent() { current = this; }
 
 	static void OnMidiInput(double timeStamp, std::vector<unsigned char> *message, void *userData);
+	static KeyMapper* Current() { return current; };
 };
 
 

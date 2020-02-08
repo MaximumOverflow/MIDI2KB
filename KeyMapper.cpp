@@ -19,12 +19,14 @@ KeyMapper::KeyMapper()
 
 KeyMapper::~KeyMapper() {}
 #else
-KeyMapper::KeyMapper() { x = xdo_new(nullptr); }
+KeyMapper::KeyMapper(): x{xdo_new(nullptr)} {}
 KeyMapper::~KeyMapper() { xdo_free(x); }
 #endif
 
+KeyMapper* KeyMapper::current;
 
-void KeyMapper::LoadKeymap()
+
+void KeyMapper::LoadKeymap(const std::string& configPath)
 {
 	if(configPath.empty())
 	{
@@ -32,6 +34,7 @@ void KeyMapper::LoadKeymap()
 		return;
 	}
 
+	this->configPath = configPath;
 	std::cout << "Loading keymap from " << configPath << "...\n";
 	delete keyMaps;
 	keyMaps = new KeyMapList(configPath);
@@ -52,12 +55,6 @@ void KeyMapper::ClearKeymap() {
 
 void KeyMapper::SelectDevice()
 {
-	if(midi.isPortOpen())
-	{
-		midi.closePort();
-		midi.cancelCallback();
-	}
-
 	if(midi.getPortCount() == 0)
 	{
 		std::cout << "No available input devices\n";
@@ -73,19 +70,36 @@ void KeyMapper::SelectDevice()
 		std::cout << "Select a device: ";
 		std::cin >> port;
 	}
-	midi.openPort(port);
-	midi.ignoreTypes();
-	midi.setCallback(KeyMapper::OnMidiInput, this);
+	SelectDevice(port);
 	std::cin.ignore(INT8_MAX, '\n');
 }
 
+void KeyMapper::SelectDevice(int device) {
+    if(device > midi.getPortCount() || device < 0)
+    {
+        std::cout << "No such device\n";
+        return;
+    }
+
+    if(midi.isPortOpen())
+    {
+        midi.closePort();
+        midi.cancelCallback();
+    }
+
+    midi.openPort(device);
+    midi.ignoreTypes();
+    midi.setCallback(KeyMapper::OnMidiInput, nullptr);
+}
+
+
 void KeyMapper::OnMidiInput(double timeStamp, std::vector<unsigned char> *message, void *userData)
 {
-	auto keyMapper = (KeyMapper*) userData;
+	auto keyMapper = current;
 	KeyEvent event(message);
 
 	if(keyMapper->logEvents)
-		std::cout << event.ToString() << '\n';
+		std::cout << '\n' << event.ToString();
 
 	if(keyMapper->keyMaps != nullptr)
 		for (auto& keymap : keyMapper->keyMaps->keyMaps)

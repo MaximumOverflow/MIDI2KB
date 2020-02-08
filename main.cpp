@@ -1,20 +1,21 @@
-#include <fstream>
 #include <iostream>
 
 #include "KeyMapper.h"
+#include "Parsing/Arguments/Argument.h"
 
-static void ShowHelp();
+void ShowHelp();
 
 int main(int argc, char *argv[]) {
     KeyMapper keyMapper;
+    keyMapper.MakeCurrent();
 
-    keyMapper.SelectDevice();
+    std::stringstream argsstr;
+    for(unsigned int i = 1; i < argc; i++)
+        argsstr << argv[i] << ' ';
 
-    if(argc >= 2)
-    {
-        keyMapper.configPath = argv[1];
-		keyMapper.LoadKeymap();
-    }
+    Argument::RunAll(argsstr.str());
+
+    if(!keyMapper.HasActiveDevice()) keyMapper.SelectDevice();
 
     std::cout << "Enter 'help' for a list of the available commands\n";
     std::string command;
@@ -26,11 +27,10 @@ int main(int argc, char *argv[]) {
         if(command == "quit" || command == "exit") break;
         else if(command == "help") ShowHelp();
         else if(command == "list") std::cout << keyMapper.GetKeyMapAsString();
-        else if(command == "reload") keyMapper.LoadKeymap();
+        else if(command == "reload") keyMapper.ReloadKeymap();
         else if(command == "change device") keyMapper.SelectDevice();
         else if(command.substr(0, 5) == "load ") {
-            keyMapper.configPath = command.substr(5, command.length());
-			keyMapper.LoadKeymap();
+			keyMapper.LoadKeymap(command.substr(5, command.length()));
         }
         else if(command == "clear") {
             keyMapper.ClearKeymap();
@@ -50,7 +50,7 @@ void ShowHelp()
 {
     std::cout <<    "quit/exit: close the program\n" <<
                     "reload: reload the current config file\n" <<
-                    "list: show the current config file\n" <<
+                    "list: show the currently loaded keymaps\n" <<
                     "clear: deselect the current config file and clear all keymaps\n" <<
                     "change device: select a new input device\n" <<
                     "load [file]: load a new config file\n" <<

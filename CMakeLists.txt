@@ -6,9 +6,14 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_BUILD_TYPE RELEASE)
 
-add_executable(MIDI2KB main.cpp KeyMap.h KeyEvent.h KeyMapper.cpp KeyMapper.h Parsing/KeyMapList.cpp Parsing/KeyMapList.h
-        Parsing/Grammar/KeyMapsLexer.h Parsing/Grammar/KeyMapsLexer.cpp
-        Parsing/Grammar/KeyMapsParser.h Parsing/Grammar/KeyMapsParser.cpp)
+add_executable(MIDI2KB main.cpp KeyMap.h KeyEvent.h KeyMapper.cpp KeyMapper.h
+
+        Parsing/KeyMaps/KeyMapList.cpp Parsing/KeyMaps/KeyMapList.h
+        Parsing/KeyMaps/Grammar/KeyMapsLexer.h Parsing/KeyMaps/Grammar/KeyMapsLexer.cpp
+        Parsing/KeyMaps/Grammar/KeyMapsParser.h Parsing/KeyMaps/Grammar/KeyMapsParser.cpp
+
+        Parsing/Arguments/Grammar/ArgumentsLexer.h Parsing/Arguments/Grammar/ArgumentsLexer.cpp
+        Parsing/Arguments/Grammar/ArgumentsParser.h Parsing/Arguments/Grammar/ArgumentsParser.cpp Parsing/Arguments/Argument.cpp Parsing/Arguments/Argument.h)
 
 include_directories(libs/common)
 include_directories(libs/common/antlr4-runtime/runtime/src/)

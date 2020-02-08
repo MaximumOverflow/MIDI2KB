@@ -11,12 +11,14 @@ add_executable(MIDI2KB main.cpp KeyMap.h KeyEvent.h KeyMapper.cpp KeyMapper.h Pa
         Parsing/Grammar/KeyMapsParser.h Parsing/Grammar/KeyMapsParser.cpp)
 
 include_directories(libs/common)
-include_directories(libs/common/antlr4-runtime)
+include_directories(libs/common/antlr4-runtime/runtime/src/)
 
 if (UNIX)
     target_link_libraries(MIDI2KB xdo)
     target_link_libraries(MIDI2KB rtmidi)
 
+    add_definitions(-DANTLR4CPP_STATIC)
+    target_link_libraries(MIDI2KB antlr4-runtime)
 endif (UNIX)
 
 

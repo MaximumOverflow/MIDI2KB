@@ -127,7 +127,34 @@ void KeyMapper::ExecuteKeymap(KeyMap &keyMap) {
 }
 #else
 void KeyMapper::ExecuteKeymap(KeyMap& keyMap) {
-	xdo_send_keysequence_window(x, CURRENTWINDOW, keyMap.toKey.c_str(), 0);
+    switch (keyMap.action)
+    {
+        case KeyMapAction::Hold:
+            xdo_send_keysequence_window_down(x, CURRENTWINDOW, keyMap.toKey.c_str(), 0);
+
+            if(logEvents) std::cout << "[REMAP EVENT] KEY: " << (unsigned short) keyMap.key << " ACTION: HOLD " << keyMap.toKey << '\n';
+            break;
+
+        case KeyMapAction::Press:
+            xdo_send_keysequence_window(x, CURRENTWINDOW, keyMap.toKey.c_str(), 0);
+            if(logEvents) std::cout << "[REMAP EVENT] KEY: " << (unsigned short) keyMap.key << " ACTION: PRESS " << keyMap.toKey << '\n';
+            break;
+
+        case KeyMapAction::Toggle:
+
+            keyMap.toggle = !keyMap.toggle;
+            if(keyMap.toggle)	xdo_send_keysequence_window_down(x, CURRENTWINDOW, keyMap.toKey.c_str(), 0);
+            else 			    xdo_send_keysequence_window_up(x, CURRENTWINDOW, keyMap.toKey.c_str(), 0);
+
+            if(logEvents) std::cout << "[REMAP EVENT] KEY: " << (unsigned short) keyMap.key << " ACTION: TOGGLE " << keyMap.toKey << " TO " << keyMap.toggle << '\n';
+            break;
+
+        case KeyMapAction::Release:
+            xdo_send_keysequence_window_up(x, CURRENTWINDOW, keyMap.toKey.c_str(), 0);
+
+            if(logEvents) std::cout << "[REMAP EVENT] KEY: " << (unsigned short) keyMap.key << " ACTION: RELEASE " << keyMap.toKey << '\n';
+            break;
+    }
 }
 #endif
 

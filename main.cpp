@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
             keyMapper.logEvents = !keyMapper.logEvents;
             std::cout << "Toggled event logging [" << (keyMapper.logEvents ? "ON" : "OFF") << "]\n";
         }
+        else std::cout << "Unknown command\n";
     }
 
     return 0;

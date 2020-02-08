@@ -1,7 +1,5 @@
 #include "KeyMapList.h"
 
-#include <antlr4-runtime/antlr4-common.h>
-#include <antlr4-runtime/antlr4-runtime.h>
 #include "Grammar/KeyMapsLexer.h"
 #include "Grammar/KeyMapsParser.h"
 

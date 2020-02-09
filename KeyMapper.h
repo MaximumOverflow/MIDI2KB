@@ -36,6 +36,7 @@ public:
 
 	std::string configPath;
 	bool logEvents = false;
+	bool enabled = true;
 
 	void LoadKeymap(const std::string& configPath);
 	void ReloadKeymap() { LoadKeymap(configPath); }

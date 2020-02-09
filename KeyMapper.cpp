@@ -75,7 +75,7 @@ void KeyMapper::SelectDevice()
 }
 
 void KeyMapper::SelectDevice(unsigned int device) {
-    if(device > midi.getPortCount())
+    if(device > midi.getPortCount()-1)
     {
         std::cout << "No such device\n";
         return;
@@ -100,7 +100,9 @@ void KeyMapper::OnMidiInput(double timeStamp, std::vector<unsigned char> *messag
 	KeyEvent event(message);
 
     if(keyMapper->logEvents)
-		std::cout << '\n' << event.ToString();
+		std::cout << event.ToString() << '\n';
+
+    if(!keyMapper->enabled) return;
 
 	if(keyMapper->keyMaps != nullptr)
 		for (auto& keymap : keyMapper->keyMaps->keyMaps)

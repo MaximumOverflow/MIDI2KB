@@ -5,13 +5,25 @@ std::unordered_map<std::string, Command> Command::commands {
         {"quit", Command([](void*) { exit(0); })},
 
         {"help", Command([](void*) {
-            std::cout <<    "quit/exit: close the program\n" <<
-                            "reload: reload the current config file\n" <<
-                            "list: show the currently loaded keymaps\n" <<
-                            "clear: deselect the current config file and clear all keymaps\n" <<
-                            "change device: select a new input device\n" <<
+            std::cout <<    "quit/exit/close: close the program\n\n" <<
+
                             "load [file]: load a new config file\n" <<
-                            "log events: toggle event logging\n";
+                            "reload: reload the current config file\n\n" <<
+
+                            "list keymaps: show the currently loaded keymaps\n" <<
+                            "list devices: show the currently available devices\n\n" <<
+
+                            "clear keymaps: deselect the current config file and clear all keymaps\n" <<
+                            "clear console: clear the console\n\n" <<
+
+                            "change device: select a new input device\n\n" <<
+
+                            "toggle [feature] [on/off]: enable/disable a feature\n"
+                            "\tList of toggleable features: logging, keymap\n\n"
+
+                            "use device [device]: select the specified input device\n"
+
+                            "use keymap [file]: <see 'load'>\n";
         })},
 
         {"load", Command([](void* args) {
@@ -60,7 +72,10 @@ std::unordered_map<std::string, Command> Command::commands {
                 KeyMapper::Current()->logEvents = state;
                 std::cout << "Toggled event logging " << (state ? "[ON]" : "[OFF]") << '\n';
             }
-            else if(ctx->keymap) { /*TODO*/ }
+            else if(ctx->keymap) {
+                KeyMapper::Current()->enabled = state;
+                std::cout << "Toggled keymap " << (state ? "[ON]" : "[OFF]") << '\n';
+            }
         })},
 
         {"use", Command([](void* args) {

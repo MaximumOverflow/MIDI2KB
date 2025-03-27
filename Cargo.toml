@@ -1,0 +1,7 @@
+[workspace]
+resolver = "2"
+members = ["cli", "gui", "lib"]
+
+[profile.dev.package."*"]
+opt-level = 3
+debug = "limited"

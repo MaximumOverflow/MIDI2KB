@@ -1,0 +1,8 @@
+[package]
+name = "midi2kb-cli"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ctrlc = "3.4.5"
+midi2kb = { path = "../lib" }

@@ -1,0 +1,8 @@
+[package]
+name = "midi2kb"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tinyvec = "1.9.0"
+midir = { version = "0.10.1", features = ["jack"] }

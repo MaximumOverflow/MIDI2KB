@@ -1,0 +1,2 @@
+hard_tabs = true
+match_arm_leading_pipes = "Preserve"

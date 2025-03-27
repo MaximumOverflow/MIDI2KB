@@ -1,7 +1,8 @@
+use serde::{Deserialize, Serialize};
 use tinyvec::ArrayVec;
 
 #[repr(u8)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum MidiEventKind {
 	#[default]
 	Unknown,

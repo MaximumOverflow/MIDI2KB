@@ -1,13 +1,28 @@
 use std::{
+	error::Error,
 	io::{Write, stdin, stdout},
 	process::ExitCode,
 	time::Duration,
 };
 
-use midi2kb::client::ClientConnector;
+use midi2kb::{client::ClientConnector, mappings::Mapping};
+
+fn read_mappings() -> Result<Vec<Mapping>, Box<dyn Error>> {
+	let json = std::fs::read("mappings.json")?;
+	let mappings = serde_json::from_slice(&json)?;
+	Ok(mappings)
+}
 
 fn main() -> ExitCode {
 	let (ctrlc_send, ctrlc_recv) = std::sync::mpsc::channel();
+
+	let mappings = match read_mappings() {
+		Ok(mappings) => mappings,
+		Err(err) => {
+			eprintln!("Could not load mappings: {err}");
+			vec![]
+		}
+	};
 
 	let (_connection, port_name) = {
 		let mut input = String::new();
@@ -31,10 +46,7 @@ fn main() -> ExitCode {
 			let Some(port) = in_ports.get(i) else {
 				continue;
 			};
-			let connection =
-				connector.connect(port, "midi2kb-input", (), move |stamp, event, _| {
-					println!("{}: {:?}", stamp, event);
-				});
+			let connection = connector.connect(port, "midi2kb-input", mappings);
 			match connection {
 				Ok(connection) => {
 					break (

@@ -1,6 +1,7 @@
+use enigo::{Direction, Enigo, InputResult, Keyboard};
 use midir::MidiInputPort;
 
-use crate::midi::{GenericMidiEvent, MidiEvent};
+use crate::{mappings::Mapping, midi::GenericMidiEvent};
 
 #[non_exhaustive]
 pub struct MidiPort {
@@ -10,7 +11,9 @@ pub struct MidiPort {
 	handle: MidiInputPort,
 }
 
-pub struct Client<T: Send + 'static>(#[allow(unused)] midir::MidiInputConnection<T>);
+pub struct Client {
+	_handle: midir::MidiInputConnection<()>,
+}
 
 pub struct ClientConnector(midir::MidiInput);
 
@@ -33,32 +36,47 @@ impl ClientConnector {
 			.collect()
 	}
 
-	pub fn connect<T, F>(
+	pub fn connect(
 		self,
 		port: &MidiPort,
 		port_name: &str,
-		data: T,
-		callback: F,
-	) -> Result<Client<T>, &'static str>
-	where
-		T: Send + 'static,
-		F: FnMut(u64, MidiEvent, &mut T) + Send + 'static,
-	{
-		let mut callback = callback;
+		mappings: Vec<Mapping>,
+	) -> Result<Client, &'static str> {
+		let Ok(mut enigo) = Enigo::new(&enigo::Settings::default()) else {
+			return Err("Could not create input mapper.");
+		};
+
 		let result = self.0.connect(
 			&port.handle,
 			port_name,
-			move |timestamp, message, data| {
-				callback(
-					timestamp,
-					MidiEvent::from(GenericMidiEvent::from(message)),
-					data,
-				)
+			move |_, message, _| {
+				let event = GenericMidiEvent::from(message);
+				eprintln!("{event:?}");
+				for mapping in &mappings {
+					if mapping.matches(&event) {
+						eprintln!("Triggered mapping {mapping:?}");
+						let result = match mapping.action {
+							crate::mappings::Action::Ignore => InputResult::Ok(()),
+							crate::mappings::Action::TapKey(key) => {
+								enigo.key(key, Direction::Click)
+							}
+							crate::mappings::Action::PressKey(key) => {
+								enigo.key(key, Direction::Press)
+							}
+							crate::mappings::Action::ReleaseKey(key) => {
+								enigo.key(key, Direction::Release)
+							}
+						};
+						if let Err(err) = result {
+							eprintln!("Input mapper error: {err}");
+						}
+					}
+				}
 			},
-			data,
+			(),
 		);
 		match result {
-			Ok(handle) => Ok(Client(handle)),
+			Ok(_handle) => Ok(Client { _handle }),
 			Err(err) => match err.kind() {
 				midir::ConnectErrorKind::InvalidPort => Err("Invalid port."),
 				midir::ConnectErrorKind::Other(other) => Err(other),

@@ -5,4 +5,5 @@ edition = "2024"
 
 [dependencies]
 ctrlc = "3.4.5"
+serde_json = "1.0.140"
 midi2kb = { path = "../lib" }
